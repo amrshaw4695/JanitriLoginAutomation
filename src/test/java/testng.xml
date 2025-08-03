@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="/Users/amritashaw/Desktop/SDET/JanitriLoginAutomation/src/test/java">
+        <classes>
+            <class name="tests.LoginTest">
+                <methods>
+                    <include name="testLoginButtonDisabledWhenFieldAreEmpty"/>
+                    <include name="testLoginBehaviourWhenFieldsAreBlank"/>
+                    <include name="testLoginBehaviourWhenInvalidCredentials"/>
+                    <include name="testPasswordVisibilityToggle"/>
+                    <include name="testLoginWithOnlyUserID"/>
+                    <include name="testLoginWithOnlyPassword"/>
+                    <include name="testUIElementsPresence"/>
+                    <include name="testPageTitleVerification"/>
+                    <include name="testLogoPresence"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
