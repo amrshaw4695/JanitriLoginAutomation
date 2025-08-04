@@ -1,13 +1,14 @@
 package base;
 
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import java.time.Duration;
@@ -46,7 +47,7 @@ public class BaseTest {
                     By.xpath("//*[contains(text(), 'please allow')]")));
 
             if (errorMsg.isDisplayed()) {
-                System.out.println("🔁 Notification banner present — refreshing page...");
+                System.out.println("Notification banner present — refreshing page...");
                 driver.navigate().refresh();
 
                 // Optionally wait for email input field to be clickable again
@@ -54,7 +55,7 @@ public class BaseTest {
                         .until(ExpectedConditions.elementToBeClickable(By.id("formEmail")));
             }
         } catch (TimeoutException e) {
-            System.out.println("✅ No in-page notification error. Proceeding...");
+            System.out.println("No error, hence Proceeding with tests.");
         }
     }
 
