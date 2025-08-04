@@ -6,141 +6,115 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
-
 public class LoginPage {
 
-    public final WebDriver driver;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
 
+    // === Locators ===
+    private final By userIDLoc = By.id("formEmail");
+    private final By passwordLoc = By.id("formPassword");
+    private final By loginButtonLoc = By.xpath("//button[@class='login-button']");
+    private final By passwordEyeIconLoc = By.xpath("//img[@class='passowrd-visible']");
+    private final By invalidCredLoc = By.xpath("//div[@class='invalid-credential-div']");
+    private final By captionLoc = By.xpath("//p[contains(text(),'Your Pregnancy and Newborn Monitoring Partner')]");
+    private final By logoLoc = By.xpath("//img[@class='login-janitri-logo']");
+    private final By notificationText = By.xpath("//p[contains(text(),'To proceed to the login page please allow')]");
+
+    // === Constructor ===
     public LoginPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    //Locators for Login Page
-    private final By userIDLoc = By.xpath("//input[@id='formEmail']");
-    private final By passwordLoc = By.xpath("//input[@id='formPassword']");
-    private final By loginLoc = By.xpath("//button[@class='login-button']");
-    private final By passwordVisibilityToggle = By.xpath("//img[@class='passowrd-visible']");
+    // === Actions ===
 
-    //Actions for Login Page
-    public void enterUserID(String userid) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        WebElement emailField = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@id='formEmail']")));
-
-        // Scroll into view just in case
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", emailField);
-
-        // Click before typing
-        emailField.click();
-        emailField.clear();
-        emailField.sendKeys(userid);
+    public void enterUserID(String userId) {
+        WebElement userField = wait.until(ExpectedConditions.elementToBeClickable(userIDLoc));
+        userField.clear();
+        userField.sendKeys(userId);
     }
-
 
     public void enterPassword(String password) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        WebElement passwordField = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@id='formPassword']")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", passwordField);
-
-        // Click before typing
-        passwordField.click();
-        passwordField.clear();
-        passwordField.sendKeys(password);
+        WebElement pwdField = wait.until(ExpectedConditions.elementToBeClickable(passwordLoc));
+        pwdField.clear();
+        pwdField.sendKeys(password);
     }
 
     public void clickLogin() {
-        WebElement btnLogin = driver.findElement(loginLoc);
-        btnLogin.click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginButtonLoc)).click();
     }
 
+    public void togglePasswordVisibility() {
+        driver.findElement(passwordEyeIconLoc).click();
+    }
 
-    // Function to checks
+    // === Validations ===
+
     public boolean isLoginButtonEnabled() {
-        WebElement loginButton = driver.findElement(loginLoc);
-        return loginButton.isEnabled();
+        return driver.findElement(loginButtonLoc).isEnabled();
     }
 
     public boolean isInvalidCredentialsPresent() {
+        handleNotificationIfPresent();
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-            // First check if login page is loaded
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("formEmail")));
-
-            // Check if notification prompt div appears — if yes, refresh
-            try {
-                WebElement notification = driver.findElement(
-                        By.xpath("//p[contains(text(),'To proceed to the login page please allow')]")
-                );
-                if (notification.isDisplayed()) {
-                    driver.navigate().refresh(); // Refresh and wait again
-                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("formEmail")));
-                }
-            } catch (NoSuchElementException ignored) {
-            }
-
-            // Now wait for the error message
-            WebElement errorDiv = wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(
-                            By.xpath("//div[@class='invalid-credential-div']")
-                    )
-            );
-
+            WebElement errorDiv = wait.until(ExpectedConditions.visibilityOfElementLocated(invalidCredLoc));
             return errorDiv.isDisplayed();
-        } catch (Exception e) {
-            System.out.println("❌ Could not detect invalid credentials div: " + e.getMessage());
+        } catch (TimeoutException e) {
             return false;
         }
     }
 
     public String getErrorMessageText() {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             WebElement errorDiv = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//div[contains(@class, 'invalid-credential-div')]")
             ));
             return errorDiv.getText().trim();
         } catch (TimeoutException e) {
-            return ""; // Or handle accordingly
+            return ""; // No error appeared
         }
     }
 
 
     public boolean isPasswordMasked() {
-        WebElement passwordField = driver.findElement(By.id("formPassword"));
-        return passwordField.getAttribute("type").equals("password");
+        return driver.findElement(passwordLoc).getAttribute("type").equals("password");
     }
 
     public boolean isPasswordUnmasked() {
-        WebElement passwordField = driver.findElement(By.id("formPassword"));
-        return passwordField.getAttribute("type").equals("text");
-    }
-
-    public void togglePasswordVisibility() {
-        WebElement eyeIcon = driver.findElement(By.xpath("//img[@class='passowrd-visible']"));  // use correct class from HTML
-        eyeIcon.click();
-    }
-
-    public boolean isCaptionVisible() {
-        WebElement title = driver.findElement(By.xpath("//p[contains(text(),'Your Pregnancy and Newborn Monitoring Partner')]"));
-        return title.isDisplayed();
+        return driver.findElement(passwordLoc).getAttribute("type").equals("text");
     }
 
     public boolean isUserIdFieldVisible() {
-        return driver.findElement(By.id("formEmail")).isDisplayed();
+        return driver.findElement(userIDLoc).isDisplayed();
     }
 
     public boolean isPasswordFieldVisible() {
-        return driver.findElement(By.id("formPassword")).isDisplayed();
+        return driver.findElement(passwordLoc).isDisplayed();
     }
 
     public boolean isEyeIconVisible() {
-        return driver.findElement(By.xpath("//img[@class='passowrd-visible']")).isDisplayed();
+        return driver.findElement(passwordEyeIconLoc).isDisplayed();
     }
 
+    public boolean isCaptionVisible() {
+        return driver.findElement(captionLoc).isDisplayed();
+    }
 
     public boolean isLogoDisplayed() {
-        WebElement logo = driver.findElement(By.xpath("//img[@class='login-janitri-logo']"));
-        return logo.isDisplayed();
+        return driver.findElement(logoLoc).isDisplayed();
+    }
+
+    // === Private Helper ===
+
+    private void handleNotificationIfPresent() {
+        try {
+            if (driver.findElement(notificationText).isDisplayed()) {
+                driver.navigate().refresh();
+                wait.until(ExpectedConditions.visibilityOfElementLocated(userIDLoc));
+            }
+        } catch (NoSuchElementException ignored) {
+        }
     }
 }

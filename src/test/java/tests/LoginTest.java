@@ -11,46 +11,38 @@ import static org.testng.Assert.assertTrue;
 public class LoginTest extends BaseTest {
 
     @Test(priority = 1)
-    void testLoginButtonDisabledWhenFieldAreEmpty() throws Exception {
-        // Arrange
-        LoginPage loginPage = new LoginPage(driver);
-
-        // Act
-        loginPage.enterUserID("");
-        loginPage.enterPassword("");
-
-        // Assert
-        assertTrue(loginPage.isLoginButtonEnabled(),
-                "Login button should be disabled when fields are empty!!");
-    }
-
-    @Test(priority = 2)
-    void testLoginBehaviourWhenFieldsAreBlank() {
+    void testLoginButtonEnabledWhenFieldsAreEmpty() throws Exception {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.enterUserID("");
         loginPage.enterPassword("");
         loginPage.clickLogin();
 
-        String errorText = loginPage.getErrorMessageText();
-        Assert.assertTrue(errorText.toLowerCase().contains("invalid"),
-                "Expected an invalid input error when fields are blank, but got: " + errorText);
+        assertTrue(loginPage.isLoginButtonEnabled(),
+                "Login button should be enabled even when fields are blank but should throw Invalid credential on Login");
+    }
+
+    @Test(priority = 2)
+    void testInvalidLoginWithEmptyFields_ShowsErrorMessage() {
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterUserID("");
+        loginPage.enterPassword("");
+        loginPage.clickLogin();
+
+        Assert.assertTrue(loginPage.isInvalidCredentialsPresent(),
+                "Error message should appear when logging in with empty fields");
     }
 
 
     @Test(priority = 3)
     void testLoginBehaviourWhenInvalidCredentials() throws Exception {
-        // Arrange
         LoginPage loginPage = new LoginPage(driver);
-
-        // Act
-        loginPage.enterUserID("amrita");
-        loginPage.enterPassword("Shaw");
+        loginPage.enterUserID("wrongUser");
+        loginPage.enterPassword("wrongPassword");
         loginPage.clickLogin();
-        System.out.println(driver.getPageSource());
 
-
-        // Assert
-        assertTrue(loginPage.isInvalidCredentialsPresent());
+        String errorText = loginPage.getErrorMessageText();
+        System.out.println("Error message shown: " + errorText);
+        Assert.assertTrue(errorText.toLowerCase().contains("invalid"), "Expected an error on invalid login.");
     }
 
     @Test(priority = 4)
@@ -72,10 +64,7 @@ public class LoginTest extends BaseTest {
 
     @Test(priority = 5)
     public void testLoginWithOnlyUserID() {
-        // Arrange
         LoginPage loginPage = new LoginPage(driver);
-
-        // Act
         loginPage.enterUserID("amrita");
         loginPage.clickLogin();
 
@@ -85,10 +74,7 @@ public class LoginTest extends BaseTest {
 
     @Test(priority = 6)
     public void testLoginWithOnlyPassword() {
-        // Arrange
         LoginPage loginPage = new LoginPage(driver);
-
-        // Act
         loginPage.enterPassword("Shaw");
         loginPage.clickLogin();
 
@@ -109,16 +95,16 @@ public class LoginTest extends BaseTest {
 
     @Test(priority = 8)
     public void testPageTitleVerification() {
-
-        String expectedTitle = "Janitri"; // This is what you see in the browser tab
+        String expectedTitle = "Janitri";
         String actualTitle = driver.getTitle();
 
         Assert.assertEquals(actualTitle, expectedTitle, "Page title should match expected title");
     }
-@Test(priority = 9)
-    public void testLogoPresence()  {
-    LoginPage loginPage = new LoginPage(driver);
-    Assert.assertTrue(loginPage.isLogoDisplayed(), "Janitri logo should be visible on the login page");
+
+    @Test(priority = 9)
+    public void testLogoPresence() {
+        LoginPage loginPage = new LoginPage(driver);
+        Assert.assertTrue(loginPage.isLogoDisplayed(), "Janitri logo should be visible on the login page");
 
     }
 

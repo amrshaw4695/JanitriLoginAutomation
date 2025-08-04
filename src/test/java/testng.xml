@@ -5,8 +5,8 @@
         <classes>
             <class name="tests.LoginTest">
                 <methods>
-                    <include name="testLoginButtonDisabledWhenFieldAreEmpty"/>
-                    <include name="testLoginBehaviourWhenFieldsAreBlank"/>
+                    <include name="testLoginButtonEnabledWhenFieldsAreEmpty"/>
+                    <include name="testInvalidLoginWithEmptyFields_ShowsErrorMessage"/>
                     <include name="testLoginBehaviourWhenInvalidCredentials"/>
                     <include name="testPasswordVisibilityToggle"/>
                     <include name="testLoginWithOnlyUserID"/>
